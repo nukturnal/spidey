@@ -60,6 +60,12 @@ Logging
 
 You may set `Spidey.logger` to a logger of your choosing. When used in a Rails environment, the logger defaults to the Rails logger. Otherwise, it's directed to STDOUT.
 
+Crawling via Proxy
+------------------
+
+You can crawl via an http proxy server by passing `proxy_addr: 'PROXY_ADDRESS', proxy_port: PORT_NUMBER` when initializing the crawler class.
+
+    spider = EbayPetSuppliesSpider.new(proxy_addr: '104.236.45.192', proxy_port: 3128)
 
 Contributing
 ------------
