@@ -3,7 +3,7 @@ require 'mechanize'
 
 module Spidey
   class AbstractSpider
-    attr_accessor :urls, :handlers, :results, :request_interval, :errors, :proxy_addr, :proxy_port
+    attr_accessor :urls, :handlers, :results, :request_interval, :errors, :proxy_addr, :proxy_port, :agent
 
     DEFAULT_REQUEST_INTERVAL = 3  # seconds
 
@@ -15,6 +15,7 @@ module Spidey
     # Accepts:
     #   request_interval: number of seconds to wait between requests (default: 3)
     def initialize(attrs = {})
+      agent
       @urls = []
       @handlers = {}
       @results = []
@@ -24,19 +25,29 @@ module Spidey
       @proxy_addr = attrs[:proxy_addr]
     end
 
+    # Make is accessible
+    def agent
+      @agent = Mechanize.new { |agent|
+        agent.user_agent_alias = 'Mac Safari'
+        agent.open_timeout = 3
+        agent.read_timeout = 4
+        agent.keep_alive = false
+        agent.max_history = 0
+      }
+    end
+
     # Iterates through URLs queued for handling, including any that are added in the course of crawling. Accepts:
     #   max_urls: maximum number of URLs to crawl before returning (optional)
     def crawl(options = {})
       unless @proxy_addr.nil? || @proxy_port.nil?
-        agent.set_proxy @proxy_addr, @proxy_port
+        @agent.set_proxy @proxy_addr, @proxy_port
       end
-      
       @errors = []
       i = 0
       each_url do |url, handler, default_data|
         break if options[:max_urls] && i >= options[:max_urls]
         begin
-          page = agent.get(url)
+          page = @agent.get(url)
           Spidey.logger.info "Handling #{url.inspect}"
           send handler, page, default_data
         rescue => ex
@@ -78,7 +89,7 @@ module Spidey
     end
 
     def resolve_url(href, page)
-      agent.agent.resolve(href, page).to_s
+      @agent.agent.resolve(href, page).to_s
     end
 
     # Strips ASCII/Unicode whitespace from ends and substitutes ASCII for Unicode internal spaces.
@@ -88,16 +99,6 @@ module Spidey
     end
 
   private
-
-    def agent
-      @agent = Mechanize.new { |agent|
-        agent.user_agent_alias = 'Mac Safari'
-        agent.open_timeout = 3
-        agent.read_timeout = 4
-        agent.keep_alive = false
-        agent.max_history = 0
-      }
-    end
 
     def self.start_urls
       @start_urls ||= []
