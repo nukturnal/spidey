@@ -29,8 +29,8 @@ module Spidey
     def agent
       @agent = Mechanize.new { |agent|
         agent.user_agent_alias = 'Mac Safari'
-        agent.open_timeout = 3
-        agent.read_timeout = 4
+        agent.open_timeout = 10
+        agent.read_timeout = 10
         agent.keep_alive = false
         agent.max_history = 0
       }
