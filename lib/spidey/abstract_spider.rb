@@ -64,18 +64,17 @@ module Spidey
         @agent.set_proxy @proxy_addr, @proxy_port
       end
 
-      if @random_proxy == true
-        proxy = ip_cycle
-        @proxy_addr = proxy[:ip]
-        @proxy_port = proxy[:port]
-        @agent.set_proxy @proxy_addr, @proxy_port
-      end
-
       @errors = []
       i = 0
       each_url do |url, handler, default_data|
         break if options[:max_urls] && i >= options[:max_urls]
         begin
+          if @random_proxy == true
+            proxy = ip_cycle
+            @proxy_addr = proxy[:ip]
+            @proxy_port = proxy[:port]
+            @agent.set_proxy @proxy_addr, @proxy_port
+          end
           page = @agent.get(url)
           Spidey.logger.info "Handling #{url.inspect}"
           send handler, page, default_data
