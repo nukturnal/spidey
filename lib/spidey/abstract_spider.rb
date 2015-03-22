@@ -66,7 +66,9 @@ module Spidey
 
       if @random_proxy == true
         proxy = ip_cycle
-        @agent.set_proxy proxy[:ip],proxy[:port]
+        @proxy_addr = proxy[:ip]
+        @proxy_port = proxy[:port]
+        @agent.set_proxy @proxy_addr, @proxy_port
       end
 
       @errors = []
