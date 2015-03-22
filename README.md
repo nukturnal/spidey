@@ -9,6 +9,7 @@ Example
 
 This example _spider_ crawls an eBay page, follows links to category pages, continues to auction detail pages, and finally records a few scraped item details as a _result_.
 
+```ruby
     class EbayPetSuppliesSpider < Spidey::AbstractSpider
       handle "http://pet-supplies.shop.ebay.com", :process_home
       
@@ -39,6 +40,7 @@ This example _spider_ crawls an eBay page, follows links to category pages, cont
     spider.crawl max_urls: 100
     
     spider.results  # => [{category: "Aquarium & Fish", title: "5 Gal. Fish Tank"...
+```
 
 Implement a _spider_ class extending `Spidey::AbstractSpider` for each target site. The class can declare starting URLs by calling `handle` at the class level. Spidey invokes each of the methods specified in those calls, passing in the resulting `page` (a [Mechanize](http://mechanize.rubyforge.org/) [Page](http://mechanize.rubyforge.org/Mechanize/Page.html) object) and, optionally, some scraped data. The methods can do whatever processing of the page is necessary, calling `handle` with additional URLs to crawl and/or `record` with scraped results.
 
@@ -65,7 +67,17 @@ Crawling via Proxy
 
 You can crawl via an http proxy server by passing `proxy_addr: 'PROXY_ADDRESS', proxy_port: PORT_NUMBER` when initializing the crawler class.
 
-    spider = EbayPetSuppliesSpider.new(proxy_addr: '104.236.45.192', proxy_port: 3128)
+```ruby
+spider = EbayPetSuppliesSpider.new(proxy_addr: '104.236.45.192', proxy_port: 3128)
+```
+
+Random & Automated Proxy Crawling
+---------------------------------
+Use a a different proxy each time you perform a crawl. This relies solely on the `proxynova` library to work.
+
+```ruby
+spider = EbayPetSuppliesSpider.new(random_proxy: true)
+```
 
 Contributing
 ------------
