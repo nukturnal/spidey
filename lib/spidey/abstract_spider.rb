@@ -76,7 +76,7 @@ module Spidey
             @agent.set_proxy @proxy_addr, @proxy_port
           end
           page = @agent.get(url)
-          Spidey.logger.info "Handling #{url.inspect}"
+          Spidey.logger.info "Handling #{url.inspect} - Proxy:#{@proxy_addr}:#{@proxy_port}"
           send handler, page, default_data
           rescue => ex
           add_error url: url, handler: handler, error: ex
