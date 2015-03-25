@@ -5,14 +5,15 @@ module Spidey
   class AbstractSpider
     attr_accessor :urls, :handlers, :results, :request_interval, :errors, :proxy_addr, :proxy_port, :agent
     attr_accessor :proxies, :random_proxy, :total_proxies, :current_proxy
-    
+
     DEFAULT_REQUEST_INTERVAL = 3  # seconds
-    
+    DEFAULT_TOTAL_PAGES = 5
+
     def self.handle(url, handler, default_data = {})
       start_urls << url
       handlers[url] = [handler, default_data]
     end
-    
+
     # Accepts:
     #   request_interval: number of seconds to wait between requests (default: 3)
     def initialize(attrs = {})
@@ -26,13 +27,20 @@ module Spidey
       @request_interval = attrs[:request_interval] || DEFAULT_REQUEST_INTERVAL
       @proxy_port = attrs[:proxy_port]
       @proxy_addr = attrs[:proxy_addr]
+
+      # This is specific for my own selfish needs actually
+      # Used heavily in my the Tooknow Search Engine Project http://tooknow.com
+      @total_pages = attrs[:total_pages] || DEFAULT_TOTAL_PAGES
+
+      # When set to true Spidey will automatically retrieve Proxy Server details from via proxynova
+      # Proxy IPs will be automatically rotated when each `handle` method is called
       @random_proxy = attrs[:random_proxy]
       if @random_proxy == true
         @proxies = Proxynova.get_list
         @total_proxies = @proxies.count
       end
     end
-    
+
     # Make is accessible
     def agent
       @agent = Mechanize.new { |agent|
@@ -56,7 +64,7 @@ module Spidey
       @total_proxies -= 1
       proxy_server
     end
-  
+
     # Iterates through URLs queued for handling, including any that are added in the course of crawling. Accepts:
     #   max_urls: maximum number of URLs to crawl before returning (optional)
     def crawl(options = {})
@@ -85,9 +93,9 @@ module Spidey
         i += 1
       end
     end
-  
+
   protected
-  
+
     # Override this for custom queueing of crawled URLs.
     def handle(url, handler, default_data = {})
         unless @handlers[url]
@@ -95,7 +103,7 @@ module Spidey
             @handlers[url] = [handler, default_data]
         end
     end
-    
+
     # Override this for custom storage or prioritization of crawled URLs.
     # Iterates through URL queue, yielding the URL, handler, and default data.
     def each_url(&block)
@@ -103,31 +111,31 @@ module Spidey
             yield url, handlers[url].first, handlers[url].last
         end
     end
-  
+
     # Override this for custom result storage.
     def record(data)
         results << data
         Spidey.logger.info "Recording #{data.inspect}"
     end
-    
+
     # Override this for custom error-handling.
     def add_error(attrs)
         @errors << attrs
         Spidey.logger.error "Error on #{attrs[:url]}. #{attrs[:error].class}: #{attrs[:error].message}"
     end
-    
+
     def resolve_url(href, page)
         @agent.agent.resolve(href, page).to_s
     end
-    
+
     # Strips ASCII/Unicode whitespace from ends and substitutes ASCII for Unicode internal spaces.
     def clean(str)
         return nil unless str
         str.gsub(/\p{Space}/, ' ').strip.squeeze(' ')
     end
-  
+
   private
-  
+
     def self.start_urls
         @start_urls ||= []
     end
