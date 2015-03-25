@@ -4,7 +4,7 @@ require 'proxynova'
 module Spidey
   class AbstractSpider
     attr_accessor :urls, :handlers, :results, :request_interval, :errors, :proxy_addr, :proxy_port, :agent
-    attr_accessor :proxies, :random_proxy, :total_proxies, :current_proxy
+    attr_accessor :proxies, :random_proxy, :total_proxies, :current_proxy, :total_pages
 
     DEFAULT_REQUEST_INTERVAL = 3  # seconds
     DEFAULT_TOTAL_PAGES = 5
