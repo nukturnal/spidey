@@ -4,10 +4,9 @@ require 'proxynova'
 module Spidey
   class AbstractSpider
     attr_accessor :urls, :handlers, :results, :request_interval, :errors, :proxy_addr, :proxy_port, :agent
-    attr_accessor :proxies, :random_proxy, :total_proxies, :current_proxy, :total_pages
+    attr_accessor :proxies, :random_proxy, :total_proxies, :current_proxy
 
     DEFAULT_REQUEST_INTERVAL = 3  # seconds
-    DEFAULT_TOTAL_PAGES = 5
 
     def self.handle(url, handler, default_data = {})
       start_urls << url
@@ -27,10 +26,6 @@ module Spidey
       @request_interval = attrs[:request_interval] || DEFAULT_REQUEST_INTERVAL
       @proxy_port = attrs[:proxy_port]
       @proxy_addr = attrs[:proxy_addr]
-
-      # This is specific for my own selfish needs actually
-      # Used heavily in my the Tooknow Search Engine Project http://tooknow.com
-      @total_pages = attrs[:total_pages] || DEFAULT_TOTAL_PAGES
 
       # When set to true Spidey will automatically retrieve Proxy Server details from via proxynova
       # Proxy IPs will be automatically rotated when each `handle` method is called
