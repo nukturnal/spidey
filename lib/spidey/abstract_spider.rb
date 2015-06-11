@@ -7,6 +7,7 @@ module Spidey
     attr_accessor :proxies, :random_proxy, :total_proxies, :current_proxy
 
     DEFAULT_REQUEST_INTERVAL = 3  # seconds
+    USER_AGENTS = ['Windows IE 7','Windows Mozilla','Mac Safari','Mac FireFox','Mac Mozilla','Linux Mozilla','Linux Firefox','Linux Konqueror']
 
     def self.handle(url, handler, default_data = {})
       start_urls << url
@@ -39,7 +40,7 @@ module Spidey
     # Make is accessible
     def agent
       @agent = Mechanize.new { |agent|
-        agent.user_agent_alias = 'Windows Mozilla'
+        agent.user_agent_alias = USER_AGENTS.sample
         agent.open_timeout = 10
         agent.read_timeout = 10
         agent.keep_alive = false
